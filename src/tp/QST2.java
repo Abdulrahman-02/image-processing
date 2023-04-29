@@ -16,10 +16,7 @@ public class QST2 {
            int largeur = blurredImage.getWidth();
            int hauteur = blurredImage.getHeight();
            
-         
-          
-       
-
+           
            // Lire les valeurs des pixels de l'image modifiée
            System.out.println("Valeurs des pixels de l'image modifiée :");
            for (int y = 0; y < hauteur; y++) {
