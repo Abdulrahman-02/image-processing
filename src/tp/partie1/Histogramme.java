@@ -1,5 +1,6 @@
 package tp.partie1;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -7,76 +8,81 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
-public class Histogramme {
+public class Histogramme extends JPanel {
 
-	public static void main(String[] args) throws IOException {
+    // attributs
+    private int[] histogram;
+    private Color color;
 
-		// Load the original image
-		BufferedImage image = ImageIO.read(new File("images/input/image.png"));
-		int width = image.getWidth();
-		int height = image.getHeight();
+    // constructeur
+    public Histogramme(int[] h, Color c) {
+        histogram = h;
+        color = c;
+    }
+    // redimensionner l'image
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.setColor(color);
+        for (int i = 0; i < 256; i++) {
+            g.drawLine(i, 200, i, 200 - (histogram[i] / 100));
+        }
+    }
 
-		// Extract the red, green and blue color channels
-		int[] reds = new int[256];
-		int[] greens = new int[256];
-		int[] blues = new int[256];
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
-				Color color = new Color(image.getRGB(i, j));
-				reds[color.getRed()]++;
-				greens[color.getGreen()]++;
-				blues[color.getBlue()]++;
-			}
-		}
+    public static void main(String[] args) {
+        // charger l'image
+        BufferedImage img = null;
+        try {
+            img = ImageIO.read(new File("images/output/tigerB.jpg"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        // récupérer la largeur et la hauteur de l'image
+        int width = img.getWidth();
+        int height = img.getHeight();
 
-		// Create a new blank image for each color channel
-		BufferedImage redImage = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
-		BufferedImage greenImage = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
-		BufferedImage blueImage = new BufferedImage(256, 256, BufferedImage.TYPE_INT_RGB);
+        // créer les tableaux des histogrammes
+        int[] redHistogram = new int[256];
+        int[] greenHistogram = new int[256];
+        int[] blueHistogram = new int[256];
 
-		// Draw the histogram for each color channel on its corresponding blank image
-		Graphics g = redImage.createGraphics();
-		g.setColor(Color.WHITE);
-		g.fillRect(0, 0, 256, 256);
-		g.setColor(Color.RED);
-		drawHistogram(g, reds);
+        // parcourir chaque pixel de l'image et incrémenter les histogrammes
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                Color c = new Color(img.getRGB(x, y));
+                redHistogram[c.getRed()]++;
+                greenHistogram[c.getGreen()]++;
+                blueHistogram[c.getBlue()]++;
+            }
+        }
 
-		g = greenImage.createGraphics();
-		g.setColor(Color.WHITE);
-		g.fillRect(0, 0, 256, 256);
-		g.setColor(Color.GREEN);
-		drawHistogram(g, greens);
+        // afficher les histogrammes
+        JFrame redFrame = new JFrame("Histogramme rouge");
+        redFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        redFrame.setSize(280, 240);
+        redFrame.setLocationRelativeTo(null);
+        Histogramme redHisto = new Histogramme(redHistogram, Color.RED);
+        redFrame.add(redHisto, BorderLayout.CENTER);
+        redFrame.setVisible(true);
 
-		g = blueImage.createGraphics();
-		g.setColor(Color.WHITE);
-		g.fillRect(0, 0, 256, 256);
-		g.setColor(Color.BLUE);
-		drawHistogram(g, blues);
+        JFrame greenFrame = new JFrame("Histogramme vert");
+        greenFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        greenFrame.setSize(280, 240);
+        greenFrame.setLocationRelativeTo(null);
+        Histogramme greenHisto = new Histogramme(greenHistogram, Color.GREEN);
+        greenFrame.add(greenHisto, BorderLayout.CENTER);
+        greenFrame.setVisible(true);
 
-		// Save each image with a different name
-		ImageIO.write(redImage, "png", new File("images/ouput/red_histogram.png"));
-		ImageIO.write(greenImage, "png", new File("images/ouput/green_histogram.png"));
-		ImageIO.write(blueImage, "png", new File("images/ouput/blue_histogram.png"));
-	}
+        JFrame blueFrame = new JFrame("Histogramme bleu");
+        blueFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        blueFrame.setSize(280, 240);
+        blueFrame.setLocationRelativeTo(null);
+        Histogramme blueHisto = new Histogramme(blueHistogram, Color.BLUE);
+        blueFrame.add(blueHisto, BorderLayout.CENTER);
+        blueFrame.setVisible(true);
 
-	private static void drawHistogram(Graphics g, int[] data) {
-		int max = getMaxValue(data);
-		for (int i = 0; i < data.length; i++) {
-			int value = data[i];
-			int x = i;
-			int y = 255 - (int) ((double) value / max * 255.0);
-			g.drawLine(x, y, x, 255);
-		}
-	}
+    }
 
-	private static int getMaxValue(int[] data) {
-		int max = Integer.MIN_VALUE;
-		for (int i = 0; i < data.length; i++) {
-			if (data[i] > max) {
-				max = data[i];
-			}
-		}
-		return max;
-	}
 }
