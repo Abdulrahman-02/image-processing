@@ -1,4 +1,4 @@
-package tp;
+package tp.partie1;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -9,7 +9,7 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-public class ImageColeur {
+public class ImageCouleur {
 
 	public static void main(String[] args) {
 
@@ -40,8 +40,6 @@ public class ImageColeur {
 			BufferedImage blurredImage = op.filter(image, null);
 
 			// Écrire la nouvelle image dans un fichier
-
-
 			ImageIO.write(blurredImage, "jpg", new File("images/output/tigerB.jpg"));
 			
 		} catch (IOException e) {
